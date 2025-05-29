@@ -8,10 +8,18 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include "http/HttpParser.h"
+#include "http/HttpRequest.h"
+#include "Routes/RouteValidator.h"
+
+
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
+
+  // used to check paths
+  RouteValidator validator;
   
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   std::cout << "Logs from your program will appear here!\n";
@@ -56,7 +64,19 @@ int main(int argc, char **argv) {
    int client = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
    std::cout << "Client connected\n";
 
-    send(client,"HTTP/1.1 200 OK\r\n\r\n",20,0);
+  HttpRequest request = HttpParser::parseRequest(client);
+
+  if (validator.isAllowed(request.getPath())) {
+    request.setStatus("200 OK");
+  }
+  else {
+    request.setStatus("404 Not Found");
+  }
+  std::string requestline = request.getRequestLine();
+  size_t requestLenght = request.getLenght();
+  std::cout << requestline << "\n";
+  send(request.getClient(),&requestline ,requestLenght,0);
+
    close(server_fd);
 
   return 0;
