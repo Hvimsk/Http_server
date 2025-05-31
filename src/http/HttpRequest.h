@@ -30,10 +30,14 @@ class HttpRequest {
 
         size_t getLenght();
 
+        void setUserAgent(std::string user_agent);
 
+        void setAcceptedReturnType(std::string acpt_type);
 
-private:
+    private:
         std::string method;
+        std::string User_agent;
+        std::string accepted_returnType;
         std::string version;
         int client;
         std::string status;
