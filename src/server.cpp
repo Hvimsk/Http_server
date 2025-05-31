@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
   }
   std::string requestline = request.getRequestLine();
   size_t requestLenght = request.getLenght();
-  std::cout << requestline << "\n";
+ // std::cout << requestline << "\n";
   send(request.getClient(),&requestline ,requestLenght,0);
 
    close(server_fd);
