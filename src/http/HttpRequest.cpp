@@ -88,6 +88,14 @@ size_t HttpRequest::getLenght() {
     return requestLine.size();
 }
 
+void HttpRequest::setUserAgent(std::string user_agent) {
+    User_agent = std::move(user_agent);
+}
+
+void HttpRequest::setAcceptedReturnType(std::string acpt_type) {
+    accepted_returnType = std::move(acpt_type);
+}
+
 
 
 
