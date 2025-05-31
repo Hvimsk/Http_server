@@ -3,13 +3,16 @@
 //
 
 #include "HttpParser.h"
+#include "../Routes/Router.h"
 static inline void failure(std::string_view message)
 {
     std::cout << "Malformed request, " << message << std::endl;
     return throw std::runtime_error("Malformed request");
 }
 
-HttpRequest HttpParser::parseRequest(int client) {
+
+
+HttpRequest HttpParser::parseRequest(int client,Router* router) {
     std::string buffer = HttpParser::GetContentOfRequestFromClient(client);
     std::string_view request(buffer);
 
@@ -26,6 +29,7 @@ HttpRequest HttpParser::parseRequest(int client) {
     version = "HTTP/1.1";
 
 
+
     std::string path;
     const auto PathEndPosition = request.find(' ');
     if (PathEndPosition == std::string::npos) {
@@ -33,8 +37,13 @@ HttpRequest HttpParser::parseRequest(int client) {
     }
     path = request.substr(0, PathEndPosition);
 
+    //todo send the fucker to the router,
+    // current issue. i need to handle data transfers
+    // no idea just yet, but who cares hihi
 
-    return HttpRequest(method, version, client, path);
+    // this returns HTTP Request type
+    return router->CreateHttpResponse(method,path,client);
+
 
 }
 

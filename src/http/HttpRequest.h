@@ -12,11 +12,11 @@ class HttpRequest {
 
 
     public:
-    HttpRequest(std::string method, std::string version, int client, int status, std::string path);
+        HttpRequest(std::string method, int client, int status, std::string path);
 
-    HttpRequest(const std::string & method, const std::string & version, int client, const std::string & path);
+        HttpRequest(const std::string & method, int client, const std::string & path);
 
-    [[nodiscard]] std::string getMethod() const;
+        [[nodiscard]] std::string getMethod() const;
         [[nodiscard]] int getClient() const;
         [[nodiscard]] std::string getStatus() const;
         [[nodiscard]] std::string getPath() const;
@@ -25,8 +25,10 @@ class HttpRequest {
 
 
         void setStatus(std::string status);
+        void setBody(std::string & body);
+        void set_content_type(std::string & body);
 
-    size_t getLenght();
+        size_t getLenght();
 
 
 
@@ -37,6 +39,9 @@ private:
         std::string status;
         std::string path;
         std::string requestLine;
+        std::string body;
+        std::string content_type;
+        std::string content_length;
 };
 
 

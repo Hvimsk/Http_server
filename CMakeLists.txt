@@ -13,10 +13,19 @@ find_package(ZLIB REQUIRED)
 add_executable(server ${SOURCE_FILES}
         src/http/HttpRequest.h
         src/http/HttpRequest.cpp
-        src/http/HttpRequest.h
+
         src/http/HttpParser.cpp
         src/http/HttpParser.h
-        src/Routes/RouteValidator.cpp
-        src/Routes/RouteValidator.h)
+
+        src/Routes/Router.cpp
+        src/Routes/Router.h
+
+        src/url_endpoints/bindings/url_Binding.cpp
+
+        src/url_endpoints/Views/interface/BaseView.h
+
+        src/url_endpoints/Views/implementations/EchoView.cpp
+        src/url_endpoints/Views/implementations/EchoView.h
+        )
 
 target_link_libraries(server PRIVATE Threads::Threads ZLIB::ZLIB)
