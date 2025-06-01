@@ -7,6 +7,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "../../../http/HttpRequest.h"
+
 class BaseView {
     public:
     virtual ~BaseView() = default;

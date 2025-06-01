@@ -84,18 +84,20 @@ void HttpRequest::set_content_type(std::string &response_content_type) {
 
 }
 
-size_t HttpRequest::getLenght() {
+
+std::string HttpRequest::getHeader(const std::string &key) const {
+    auto it = headers.find(key);
+    if (it != headers.end()) return it->second;
+    return "";
+}
+
+void HttpRequest::setHeader(const std::string& key, const std::string& value) {
+    headers[key] = value;
+}
+
+size_t HttpRequest::getLenght() const {
     return requestLine.size();
 }
-
-void HttpRequest::setUserAgent(std::string user_agent) {
-    User_agent = std::move(user_agent);
-}
-
-void HttpRequest::setAcceptedReturnType(std::string acpt_type) {
-    accepted_returnType = std::move(acpt_type);
-}
-
 
 
 

@@ -46,28 +46,35 @@ public:
         routeHandlers[{method, pattern}] = response_view;
     }
 
-    HttpRequest CreateHttpResponse(const std::string& method, const std::string& path,int client) const {
+    HttpRequest CreateHttpResponse(HttpRequest request) const {
         for (const auto& [routeMethod, pattern] : routePatterns) {
-            if (routeMethod != method) continue;
+            if (routeMethod != request.getMethod()) continue;
 
-            auto params = extractParams(pattern, path);
-            if (!params.empty()) {
-                auto it = routeHandlers.find({method, pattern});
+
+            auto params = extractParams(pattern, request.getPath());
+
+            bool isExactMatch = (pattern == request.getPath());
+
+            if (isExactMatch || !params.empty()) {
+                auto it = routeHandlers.find({request.getMethod(), pattern});
                 if (it != routeHandlers.end()) {
+                    params["Host"] = request.getHeader("Host");
+                    params["User-Agent"] = request.getHeader("User-Agent");
+                    params["Accept"] = request.getHeader("Accept");
                     it->second->process_incoming_request(params);
-                    HttpRequest response = HttpRequest(method, client, path);
-                    response.setBody(it->second->getBody());
-                    response.setStatus(it->second->getStatus());
-                    response.set_content_type(it->second->getContent_type());
-                    return response;
+
+                    request.setBody(it->second->getBody());
+                    request.setStatus(it->second->getStatus());
+                    request.set_content_type(it->second->getContent_type());
+                    return request;
                 }
             }
         }
-        std::cout << "404 Not Found: " << method << " " << path << std::endl;
+        std::cout << "404 Not Found: " << request.getMethod() << " " << request.getPath() << std::endl;
         //Todo Add malformed response
-        HttpRequest resposne = HttpRequest(method, client, path);
-        resposne.setStatus("404 Not Found: ");
-        return resposne;
+
+        request.setStatus("404 Not Found: ");
+        return request;
     }
 
 

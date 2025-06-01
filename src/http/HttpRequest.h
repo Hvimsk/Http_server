@@ -6,6 +6,7 @@
 #define HTTPREQUEST_H
 #include <iostream>
 #include <unistd.h>
+#include <unordered_map>
 
 
 class HttpRequest {
@@ -21,6 +22,8 @@ class HttpRequest {
         [[nodiscard]] std::string getStatus() const;
         [[nodiscard]] std::string getPath() const;
         [[nodiscard]] std::string getVersion() const;
+
+
         [[nodiscard]] const std::string getRequestLine() const;
 
 
@@ -28,16 +31,18 @@ class HttpRequest {
         void setBody(std::string & body);
         void set_content_type(std::string & body);
 
-        size_t getLenght();
-
-        void setUserAgent(std::string user_agent);
-
         void setAcceptedReturnType(std::string acpt_type);
+        std::string getHeader(const std::string& key) const;
+        void setHeader(const std::string& key, const std::string& value);
+
+
+        size_t getLenght() const;
+
+
 
     private:
         std::string method;
-        std::string User_agent;
-        std::string accepted_returnType;
+        std::unordered_map<std::string, std::string> headers;
         std::string version;
         int client;
         std::string status;

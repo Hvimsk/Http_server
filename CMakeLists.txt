@@ -26,6 +26,8 @@ add_executable(server ${SOURCE_FILES}
 
         src/url_endpoints/Views/implementations/EchoView.cpp
         src/url_endpoints/Views/implementations/EchoView.h
-        )
+        src/url_endpoints/Views/implementations/UserAgentTestView.cpp
+        src/url_endpoints/Views/implementations/UserAgentTestView.h
+)
 
 target_link_libraries(server PRIVATE Threads::Threads ZLIB::ZLIB)

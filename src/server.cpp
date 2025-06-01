@@ -11,7 +11,18 @@
 #include "http/HttpParser.h"
 #include "http/HttpRequest.h"
 #include "url_endpoints/bindings/url_Binding.cpp"
+#include <thread>
 
+void handle_connection(Router router, int client) {
+  HttpRequest request = HttpParser::parseRequest(client,&router);
+
+  std::string requestline = request.getRequestLine();
+  send(client,requestline.c_str(),requestline.length(),0);
+  if (request.getHeader("Connection")=="close") {
+    close(client);
+  }
+  //close(client);
+}
 
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
@@ -57,20 +68,19 @@ int main(int argc, char **argv) {
      return 1;
    }
 
-   struct sockaddr_in client_addr;
-   int client_addr_len = sizeof(client_addr);
+
 
    std::cout << "Waiting for a client to connect...\n";
+    while (true) {
+        struct sockaddr_in client_addr;
+        int client_addr_len = sizeof(client_addr);
+        int client = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
+        std::cout << "Client connected\n";
 
-   int client = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
-   std::cout << "Client connected\n";
+        std::thread(handle_connection,router, client).detach();
 
-  HttpRequest request = HttpParser::parseRequest(client,&router);
 
-  std::string requestline = request.getRequestLine();
-  send(client,requestline.c_str(),requestline.length(),0);
-
-   close(server_fd);
-
+    }
+  close(server_fd);
   return 0;
 }

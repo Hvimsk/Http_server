@@ -14,38 +14,49 @@ static inline void failure(std::string_view message)
 
 HttpRequest HttpParser::parseRequest(int client,Router* router) {
     std::string buffer = HttpParser::GetContentOfRequestFromClient(client);
-    std::string_view request(buffer);
+    std::istringstream stream(buffer);
+    std::string line;
 
-    const auto methodEndPosition = request.find(' ');
-    if (methodEndPosition == std::string::npos) {
-        failure("cant find method");
+    std::string method, path, version;
+    std::unordered_map<std::string, std::string> headers;
+
+    // Parse request line
+    std::getline(stream, line);
+    std::istringstream reqLine(line);
+    reqLine >> method >> path >> version;
+
+    // Parse headers
+    while (std::getline(stream, line)) {
+        if (line == "\r" || line == "" || line == "\n") break;
+
+        // Remove \r
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+
+        size_t colon = line.find(':');
+        if (colon != std::string::npos) {
+            std::string key = line.substr(0, colon);
+            std::string value = line.substr(colon + 1);
+            if (!value.empty() && value[0] == ' ') value.erase(0, 1);
+            headers[key] = value;
+        }
     }
 
-    std::string method;
-    method = request.substr(0, methodEndPosition);
-    request.remove_prefix(methodEndPosition + 1);
-
-    std::string version;
-    version = "HTTP/1.1";
-
-
-
-    std::string path;
-    const auto PathEndPosition = request.find(' ');
-    if (PathEndPosition == std::string::npos) {
-        failure("cant find path");
+    // Build HttpRequest object
+    HttpRequest req(method, client, path);
+    for (const auto& [k, v] : headers) {
+        req.setHeader(k,v);
     }
-    path = request.substr(0, PathEndPosition);
 
-    //todo send the fucker to the router,
-    // current issue. i need to handle data transfers
-    // no idea just yet, but who cares hihi
-
-    // this returns HTTP Request type
-    return router->CreateHttpResponse(method,path,client);
-
+    return router->CreateHttpResponse(req);
 
 }
+
+
+
+
+
 
 std::string HttpParser::GetContentOfRequestFromClient(int client) {
     constexpr int buffer_size = 1024;
